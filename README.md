@@ -1,6 +1,6 @@
 # Xtreme Management API
 
-API developed with Spring Boot for managing resources of the **Xtreme Gym Management** system.
+API developed with Spring Boot for managing resources of the **Xtreme Gym** system.
 
 ## 🚀 Technologies
 
