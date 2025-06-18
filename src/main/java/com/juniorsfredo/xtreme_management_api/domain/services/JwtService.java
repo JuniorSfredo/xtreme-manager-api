@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidAuthorizationHeaderException;
+import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidCredentialsException;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,7 @@ public class JwtService {
             throw new JWTCreationException("Erro ao gerar token.", exception);
         }
     }
-    
+
     public String validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
@@ -51,8 +53,18 @@ public class JwtService {
         }
     }
 
+    public String extractJwtTokenFromHeader(String authorizationHeader) {
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.replace("Bearer ", "").trim();
+            if (token.isEmpty()) throw new InvalidAuthorizationHeaderException("Token is empty.");
+            return token;
+        }
+
+        throw new InvalidAuthorizationHeaderException("Authorization header is missing or invalid.");
+    }
+
     private Instant expirationDate() {
         return LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.of("-03:00"));
     }
-
 }

@@ -56,7 +56,7 @@ public class AuthFilter extends OncePerRequestFilter {
     private String recoveryToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null) {
-            return authorizationHeader.replace("Bearer ", "");
+            return jwtService.extractJwtTokenFromHeader(authorizationHeader);
         }
         return null;
     }

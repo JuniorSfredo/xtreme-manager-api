@@ -1,5 +1,6 @@
 package com.juniorsfredo.xtreme_management_api.infrastructure.config.security;
 
+import com.juniorsfredo.xtreme_management_api.api.cors.CorsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,9 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -18,17 +22,20 @@ public class SecurityConfig {
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
             "/auth/login",
+            "/users/{id}",
+            "/assessments/{id}",
+            "/assessments/users/{userId}/latest-two",
+            "/auth/user/get-by-token",
     };
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
     };
 
     public static final String[] ENDPOINTS_MEMBER = {
-            "/users/{id}"
+
     };
 
     public static final String[] ENDPOINTS_PERSONAL = {
-            "/auth/register",
     };
 
     public static final String[] ENDPOINTS_ADMIN = {
@@ -36,14 +43,19 @@ public class SecurityConfig {
 
     AuthFilter authFilter;
 
+    private final CorsConfig corsConfig;
+
+
     @Autowired
-    public SecurityConfig(AuthFilter authFilter) {
+    public SecurityConfig(AuthFilter authFilter, CorsConfig corsConfig) {
         this.authFilter = authFilter;
+        this.corsConfig = corsConfig;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthFilter authFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthFilter authFilter, CorsConfigurationSource corsConfigurationSource) throws Exception {
         return httpSecurity
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth

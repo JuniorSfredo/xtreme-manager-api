@@ -1,14 +1,12 @@
 package com.juniorsfredo.xtreme_management_api.api.controllers;
 
+import com.juniorsfredo.xtreme_management_api.api.dto.auth.AuthenticatedUserResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserResponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,13 +23,13 @@ public class UserController {
 
     @GetMapping()
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        List<UserResponseDTO> response = userService.findAllUsers();
-        return ResponseEntity.ok(response);
+        List<UserResponseDTO> usersResponse = userService.findAllUsers();
+        return ResponseEntity.ok(usersResponse);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDetailsResponseDTO> getUserById(@PathVariable Long id) {
-        UserDetailsResponseDTO userResponse = userService.findUserById(id);
+        UserDetailsResponseDTO userResponse = userService.getUserById(id);
         return ResponseEntity.ok(userResponse);
     }
 }

@@ -1,5 +1,7 @@
 package com.juniorsfredo.xtreme_management_api.api.assembler;
 
+import com.juniorsfredo.xtreme_management_api.api.dto.auth.AuthenticatedResponseDTO;
+import com.juniorsfredo.xtreme_management_api.api.dto.auth.AuthenticatedUserResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.auth.UserRegisterDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
 import org.modelmapper.ModelMapper;
@@ -18,5 +20,9 @@ public class AuthAssembler {
 
     public User userRegisterToEntityDTO(UserRegisterDTO userRegister) {
         return mapper.map(userRegister, User.class);
+    }
+
+    public AuthenticatedUserResponseDTO userToAuthenticatedUserDTO(User user) {
+        return mapper.map(user, AuthenticatedUserResponseDTO.class);
     }
 }

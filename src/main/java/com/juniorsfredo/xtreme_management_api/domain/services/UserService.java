@@ -51,11 +51,16 @@ public class UserService {
         return userAssembler.toUserResponseDTO(savedUser);
     }
 
-    public UserDetailsResponseDTO findUserById(Long id) {
+    public UserDetailsResponseDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
         return userAssembler.toUserDetailsResponseDTO(user);
+    }
+
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
     }
 
     private List<Role> verifyRolesToCreateUser(List<Role> roles) {

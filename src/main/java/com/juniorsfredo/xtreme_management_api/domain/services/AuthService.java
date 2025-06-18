@@ -2,10 +2,9 @@ package com.juniorsfredo.xtreme_management_api.domain.services;
 
 import com.juniorsfredo.xtreme_management_api.api.assembler.AuthAssembler;
 import com.juniorsfredo.xtreme_management_api.api.assembler.RoleAssembler;
-import com.juniorsfredo.xtreme_management_api.api.dto.auth.AccessTokenDTO;
-import com.juniorsfredo.xtreme_management_api.api.dto.auth.UserLoginDTO;
-import com.juniorsfredo.xtreme_management_api.api.dto.auth.UserRegisterDTO;
+import com.juniorsfredo.xtreme_management_api.api.dto.auth.*;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserResponseDTO;
+import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidCredentialsException;
 import com.juniorsfredo.xtreme_management_api.domain.models.Role;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,14 +44,22 @@ public class AuthService {
         this.roleAssembler = roleAssembler;
     }
 
-    public AccessTokenDTO login(UserLoginDTO userBody) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(userBody.email(), userBody.password());
+    public AuthenticatedResponseDTO login(UserLoginDTO userBody) {
+        try {
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(userBody.email(), userBody.password());
 
-        Authentication authentication = authManager.authenticate(usernamePasswordAuthenticationToken);
+            Authentication authentication = authManager.authenticate(usernamePasswordAuthenticationToken);
 
-        String token = jwtService.generateToken((User) authentication.getPrincipal());
-        return new AccessTokenDTO(token);
+            User user = (User) authentication.getPrincipal();
+
+            AuthenticatedUserResponseDTO authenticatedUser = authAssembler.userToAuthenticatedUserDTO(user);
+
+            String token = jwtService.generateToken(user);
+            return new AuthenticatedResponseDTO(token, authenticatedUser);
+        } catch (AuthenticationException e) {
+            throw new InvalidCredentialsException("Invalid credentials. Verify and try again.");
+        }
     }
 
     public UserResponseDTO register(UserRegisterDTO userBody) {
@@ -64,5 +72,11 @@ public class AuthService {
         User user = authAssembler.userRegisterToEntityDTO(userBody);
         user.setRoles(roleReferences);
         return userService.createUser(user);
+    }
+
+    public AuthenticatedUserResponseDTO getUserByToken(String token) {
+        String tokenSubject = jwtService.validateToken(token);
+        User user = userService.findUserByEmail(tokenSubject);
+        return authAssembler.userToAuthenticatedUserDTO(user);
     }
 }

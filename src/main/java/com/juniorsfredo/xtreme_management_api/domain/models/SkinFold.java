@@ -21,6 +21,6 @@ public class SkinFold {
     private Double mm;
 
     @ManyToOne
-    @JoinColumn(name = "assesment_id")
+    @JoinColumn(name = "assessment_id")
     private Assessment assessment;
 }
