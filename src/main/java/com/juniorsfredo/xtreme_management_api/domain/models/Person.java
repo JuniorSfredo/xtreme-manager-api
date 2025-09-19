@@ -1,5 +1,6 @@
 package com.juniorsfredo.xtreme_management_api.domain.models;
 
+import com.juniorsfredo.xtreme_management_api.domain.parsers.CpfParser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,4 +33,7 @@ public class Person {
     @Column(name = "profile_img_url", nullable = false)
     private String profileImgUrl;
 
+    public void setCpf(String cpf) {
+        this.cpf = CpfParser.parse(cpf);
+    }
 }

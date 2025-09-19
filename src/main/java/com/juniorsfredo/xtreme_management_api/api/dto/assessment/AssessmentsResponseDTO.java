@@ -1,5 +1,6 @@
 package com.juniorsfredo.xtreme_management_api.api.dto.assessment;
 
+import com.juniorsfredo.xtreme_management_api.api.dto.references.PersonalReferenceDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,4 +13,6 @@ public class AssessmentsResponseDTO {
     private Double imc;
     private LocalDateTime date;
     private Double bodyfatPercentage;
+    private Double weight;
+    private PersonalReferenceDTO personal;
 }

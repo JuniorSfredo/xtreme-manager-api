@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = CpfValidator.class)
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidateCpf {
+public @interface IsCpf {
 
     String message() default "Invalid CPF, verify and try again";
 

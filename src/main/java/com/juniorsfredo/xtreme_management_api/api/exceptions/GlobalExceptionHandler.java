@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-
     @ExceptionHandler({UserAlreadyExistsException.class})
     public ResponseEntity<?> handleUserAlreadyExistsException(UserAlreadyExistsException ex, WebRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -41,13 +40,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({InvalidCredentialsException.class})
     public ResponseEntity<?> handleInvalidCredentialsException(InvalidCredentialsException ex, WebRequest request) {
-        HttpStatus status = HttpStatus.UNAUTHORIZED;
-        GlobalErrorResponse errorResponse = newErrorResponse(status.value(), ex.getMessage());
-        return handleExceptionInternal(ex, errorResponse, new HttpHeaders(), status, request);
-    }
-
-    @ExceptionHandler({AuthException.class})
-    public ResponseEntity<?> handleAuthException(AuthException ex, WebRequest request) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         GlobalErrorResponse errorResponse = newErrorResponse(status.value(), ex.getMessage());
         return handleExceptionInternal(ex, errorResponse, new HttpHeaders(), status, request);

@@ -1,7 +1,9 @@
 package com.juniorsfredo.xtreme_management_api.api.assembler;
 
+import com.juniorsfredo.xtreme_management_api.api.dto.streak.WeeklyStreakDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserResponseDTO;
+import com.juniorsfredo.xtreme_management_api.api.dto.user.UserWeeklyStreaksResponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,5 +25,9 @@ public class UserAssembler {
 
     public UserDetailsResponseDTO toUserDetailsResponseDTO(User user) {
         return mapper.map(user, UserDetailsResponseDTO.class);
+    }
+
+    public UserWeeklyStreaksResponseDTO toUserWeeklyStreakResponseDTO(UserDetailsResponseDTO user, WeeklyStreakDTO streak) {
+        return new UserWeeklyStreaksResponseDTO(user, streak);
     }
 }

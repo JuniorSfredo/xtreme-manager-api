@@ -1,6 +1,8 @@
 package com.juniorsfredo.xtreme_management_api.domain.exceptions;
 
-public class InvalidAuthorizationHeaderException extends AuthException {
+import org.springframework.security.core.AuthenticationException;
+
+public class InvalidAuthorizationHeaderException extends AuthenticationException {
     public InvalidAuthorizationHeaderException(String message) {
         super(message);
     }

@@ -44,7 +44,7 @@ public class AuthService {
         this.roleAssembler = roleAssembler;
     }
 
-    public AuthenticatedResponseDTO login(UserLoginDTO userBody) {
+    public AuthenticatedResponseDTO login(UserLoginDTO userBody)  {
         try {
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                     new UsernamePasswordAuthenticationToken(userBody.email(), userBody.password());

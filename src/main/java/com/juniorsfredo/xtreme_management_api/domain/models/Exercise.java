@@ -21,8 +21,8 @@ public class Exercise {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "number_of_sets", nullable = false)
-    private Integer numberOfSets;
+    @Column(name = "series_number", nullable = false)
+    private Integer seriesNumber;
 
     @Column(name = "min_reps", nullable = false)
     private Integer minReps;

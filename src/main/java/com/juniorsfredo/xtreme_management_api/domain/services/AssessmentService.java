@@ -3,10 +3,12 @@ package com.juniorsfredo.xtreme_management_api.domain.services;
 import com.juniorsfredo.xtreme_management_api.api.assembler.AssessmentAssembler;
 import com.juniorsfredo.xtreme_management_api.api.dto.assessment.AssessmentDetailsDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.assessment.AssessmentsResponseDTO;
+import com.juniorsfredo.xtreme_management_api.api.dto.assessment.PaginatedAssessmentsReponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.AssessmentNotFoundException;
 import com.juniorsfredo.xtreme_management_api.domain.models.Assessment;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.AssessmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -30,16 +32,22 @@ public class AssessmentService {
         this.userService = userService;
     }
 
-    public List<AssessmentsResponseDTO> getAllAssessmentsByUserId(Long userId, Integer page) {
+    public PaginatedAssessmentsReponseDTO getAllAssessmentsByUserId(Long userId, Integer page) {
         Long validUserId = userService.getUserById(userId).getId();
 
         int pageIndex = page <= 0 ? 0 : page - 1;
-        List<Assessment> assessments =
-                assessmentRepository.findAllAssessmentsByUserId(validUserId, PageRequest.of(pageIndex, 10));
+        Page<Assessment> paginatedAssessments =
+                assessmentRepository.findAllCompletedAssessmentsByUserId(validUserId, PageRequest.of(pageIndex, 10));
 
-        return assessments.stream()
+        List<Assessment> assessments = paginatedAssessments.getContent();
+        Integer totalPages = paginatedAssessments.getTotalPages();
+        Integer currentPage = paginatedAssessments.getNumber() + 1;
+
+        List<AssessmentsResponseDTO> assessmentsResponseDTO = assessments.stream()
                 .map(assessment -> assessmentAssembler.toResponseDTO(assessment))
                 .toList();
+
+        return assessmentAssembler.toPaginatedAssessments(totalPages, currentPage, assessmentsResponseDTO);
     }
 
     public AssessmentDetailsDTO getAssessmentById(Long assessmentId) {
@@ -49,9 +57,9 @@ public class AssessmentService {
         return assessmentAssembler.toDetailsResponseDTO(assessment);
     }
 
-    public List<AssessmentsResponseDTO> getLastTwoAssessments(Long userId) {
+    public List<AssessmentsResponseDTO> getLastestAssessments(Long userId) {
         List<Assessment> assessments = assessmentRepository
-                .findLastTwoAssessmentByUserId(userId, PageRequest.of(0, 2));
+                .findLastThreeAssessmentByUserId(userId, PageRequest.of(0, 3));
 
         return assessments.stream()
                 .map(assessment -> assessmentAssembler.toResponseDTO(assessment))

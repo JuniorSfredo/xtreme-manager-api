@@ -15,10 +15,10 @@ public class WorkoutRegister {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "data_inicio")
+    @Column(name = "start_date")
     private Instant startDate;
 
-    @Column(name = "data_fim")
+    @Column(name = "end_date")
     private Instant endDate;
 
     @OneToOne

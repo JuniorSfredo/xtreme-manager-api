@@ -1,8 +1,10 @@
 package com.juniorsfredo.xtreme_management_api.domain.services;
 
+import com.juniorsfredo.xtreme_management_api.api.dto.streak.WeeklyStreakDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.assembler.UserAssembler;
+import com.juniorsfredo.xtreme_management_api.api.dto.user.UserWeeklyStreaksResponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidDataException;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.UserAlreadyExistsException;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.UserNotFoundException;
@@ -10,10 +12,12 @@ import com.juniorsfredo.xtreme_management_api.domain.models.Role;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,13 +30,17 @@ public class UserService {
 
     private final RoleService roleService;
 
+    private WorkoutRegisterService workoutRegisterService;
+
     @Autowired
     public UserService(UserRepository userRepository,
                        UserAssembler userAssembler,
-                       RoleService roleService) {
+                       RoleService roleService,
+                       @Lazy WorkoutRegisterService workoutRegisterService) {
         this.userRepository = userRepository;
         this.userAssembler = userAssembler;
         this.roleService = roleService;
+        this.workoutRegisterService = workoutRegisterService;
     }
 
     public List<UserResponseDTO> findAllUsers() {
@@ -52,7 +60,7 @@ public class UserService {
     }
 
     public UserDetailsResponseDTO getUserById(Long id) {
-        User user = userRepository.findById(id)
+        User user = this.findUserById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
         return userAssembler.toUserDetailsResponseDTO(user);
@@ -61,6 +69,16 @@ public class UserService {
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+    }
+
+    public UserWeeklyStreaksResponseDTO getUserByIdWithStreaks(Long id) {
+        UserDetailsResponseDTO user = this.getUserById(id);
+        WeeklyStreakDTO streaks = workoutRegisterService.getWeeklyStreak();
+        return userAssembler.toUserWeeklyStreakResponseDTO(user, streaks);
+    }
+
+    protected Optional<User> findUserById(Long userId) {
+        return userRepository.findById(userId);
     }
 
     private List<Role> verifyRolesToCreateUser(List<Role> roles) {

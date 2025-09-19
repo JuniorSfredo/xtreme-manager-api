@@ -2,10 +2,13 @@ package com.juniorsfredo.xtreme_management_api.api.assembler;
 
 import com.juniorsfredo.xtreme_management_api.api.dto.assessment.AssessmentDetailsDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.assessment.AssessmentsResponseDTO;
+import com.juniorsfredo.xtreme_management_api.api.dto.assessment.PaginatedAssessmentsReponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.Assessment;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class AssessmentAssembler {
@@ -25,4 +28,10 @@ public class AssessmentAssembler {
         return mapper.map(assessment, AssessmentDetailsDTO.class);
     }
 
+    public PaginatedAssessmentsReponseDTO toPaginatedAssessments(Integer totalPages,
+                                                                 Integer currentPage,
+                                                                 List<AssessmentsResponseDTO> assessments)
+    {
+        return new PaginatedAssessmentsReponseDTO(totalPages, currentPage, assessments);
+    }
 }

@@ -22,17 +22,25 @@ public class SecurityConfig {
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
             "/auth/login",
-            "/users/{id}",
-            "/assessments/{id}",
-            "/assessments/users/{userId}/latest-two",
-            "/auth/user/get-by-token",
     };
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
+            "/users/{id}",
+            "/assessments/{id}",
+            "/assessments/users/{userId}",
+            "/assessments/users/{userId}/latest-three",
+            "/auth/user/get-by-token",
+            "/workouts/users/{userId}",
+            "/workouts/{id}",
+            "/register-workout",
+            "/auth/logout",
+            "/workouts/{personalId}/{memberId}/create-workout",
+            "/members/{personalId}/register-member",
+            "/users/{id}/streaks",
+            "/register-workout/{userId}",
     };
 
     public static final String[] ENDPOINTS_MEMBER = {
-
     };
 
     public static final String[] ENDPOINTS_PERSONAL = {
@@ -56,7 +64,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthFilter authFilter, CorsConfigurationSource corsConfigurationSource) throws Exception {
         return httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // WARN: DONT PROD
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()

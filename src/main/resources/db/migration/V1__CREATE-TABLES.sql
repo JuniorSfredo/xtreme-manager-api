@@ -33,7 +33,7 @@ create table tb_exercise
 (
     max_reps integer not null,
     min_reps integer not null,
-    number_of_sets     integer not null,
+    series_number     integer not null,
     id             bigint not null auto_increment,
     name           varchar(255),
     primary key (id)
@@ -42,6 +42,7 @@ create table tb_exercise
 create table tb_subscription
 (
     expiration_date  date,
+    created_at       date,
     member_id         bigint,
     id               bigint not null auto_increment,
     plan_id         bigint,
@@ -117,8 +118,6 @@ create table tb_user
     primary key (id)
 ) engine=InnoDB;
 
-alter table tb_workout_register
-    add constraint UK2ihkfmymm1t6xqpq8c9il0xjj unique (workout_id);
 alter table tb_member
     add constraint FKdsc9jop9hqwlo0cypuxv3weeq foreign key (id) references tb_user (id);
 alter table tb_assessment

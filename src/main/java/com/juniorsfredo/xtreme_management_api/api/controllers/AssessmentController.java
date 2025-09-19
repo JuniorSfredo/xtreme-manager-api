@@ -2,6 +2,7 @@ package com.juniorsfredo.xtreme_management_api.api.controllers;
 
 import com.juniorsfredo.xtreme_management_api.api.dto.assessment.AssessmentDetailsDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.assessment.AssessmentsResponseDTO;
+import com.juniorsfredo.xtreme_management_api.api.dto.assessment.PaginatedAssessmentsReponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.services.AssessmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,13 @@ public class AssessmentController {
         this.assessmentService = assessmentService;
     }
 
-    @GetMapping("/users/{userId}/")
-    public ResponseEntity<List<AssessmentsResponseDTO>> getAllAssessmentsByUserId(@PathVariable Long userId,
-                                                                                  @RequestParam(
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<PaginatedAssessmentsReponseDTO> getAllAssessmentsByUserId(@PathVariable Long userId,
+                                                                                    @RequestParam(
                                                                                           name = "page",
                                                                                           defaultValue = "0")
                                                                                   Integer page) {
-        List<AssessmentsResponseDTO> response = assessmentService.getAllAssessmentsByUserId(userId, page);
+        PaginatedAssessmentsReponseDTO response = assessmentService.getAllAssessmentsByUserId(userId, page);
         return ResponseEntity.ok(response);
     }
 
@@ -36,9 +37,9 @@ public class AssessmentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/users/{userId}/latest-two")
-    public ResponseEntity<List<AssessmentsResponseDTO>> getLatestTwoAssessmentsByUserId(@PathVariable Long userId) {
-        List<AssessmentsResponseDTO> response = assessmentService.getLastTwoAssessments(userId);
+    @GetMapping("/users/{userId}/latest-three")
+    public ResponseEntity<List<AssessmentsResponseDTO>> getLatestAssessmentsByUserId(@PathVariable Long userId) {
+        List<AssessmentsResponseDTO> response = assessmentService.getLastestAssessments(userId);
         return ResponseEntity.ok(response);
     }
 }

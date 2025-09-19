@@ -63,12 +63,12 @@ VALUES (2, '2022-02-01', 3500.0);
 
 -- Populando tb_member
 INSERT INTO tb_member (id, is_active, created_at)
-VALUES (3, 1, NOW());
+VALUES (3, 1, CURRENT_TIMESTAMP);
 
 -- Populando tb_user_role
 INSERT INTO tb_user_role (user_id, role_id)
 VALUES (1, 1),
-       (2, 2),
+       (2, 3),
        (3, 2);
 
 -- Populando tb_plan
@@ -78,17 +78,17 @@ VALUES (1, 'MONTHLY', 99.90),
        (3, 'ANNUAL', 900.00);
 
 -- Populando tb_subscription
-INSERT INTO tb_subscription (id, member_id, plan_id, expiration_date, payment_status)
-VALUES (1, 3, 1, '2025-06-10', 'PAGO');
+INSERT INTO tb_subscription (id, member_id, plan_id, expiration_date, payment_status, created_at)
+VALUES (1, 3, 1, '2025-06-10', 'PAGO', CURRENT_TIMESTAMP);
 
 -- Populando tb_exercise
-INSERT INTO tb_exercise (id, name, max_reps, min_reps, number_of_sets)
+INSERT INTO tb_exercise (id, name, max_reps, min_reps, series_number)
 VALUES (1, 'Supino Reto', 12, 8, 4),
        (2, 'Agachamento', 15, 10, 4);
 
 -- Populando tb_workout
 INSERT INTO tb_workout (id, member_id, personal_id, name)
-VALUES (1, 3, 2, 'Treino A');
+VALUES (1, 3, 2, 'BACK');
 
 -- Populando tb_workout_exercise
 INSERT INTO tb_workout_exercise (workout_id, exercise_id)
@@ -97,7 +97,11 @@ VALUES (1, 1),
 
 -- Populando tb_workout_register
 INSERT INTO tb_workout_register (id, workout_id, start_date, end_date)
-VALUES (1, 1, '2025-05-01 08:00:00', '2025-05-01 09:00:00');
+VALUES
+    (10, 1, '2025-08-11 06:30:00', '2025-08-11 07:15:00'), -- segunda
+    (11, 1, '2025-08-12 06:30:00', '2025-08-12 07:15:00'), -- terça
+    (12, 1, '2025-08-13 06:30:00', '2025-08-13 07:15:00'), -- quarta
+    (13, 1, '2025-08-14 19:30:00', '2025-08-14 20:15:00'); -- quinta
 
 -- Populando tb_assessment
 INSERT INTO tb_assessment (id, member_id, personal_id, date, imc, bodyfat_percentage, weight, note, status)
@@ -110,8 +114,8 @@ VALUES (1, 3, 2, '2025-05-01 10:00:00', 22.5, 18.0, 60.0, 'Avaliação inicial',
        (7, 3, 2, '2025-05-19 09:00:00', 25.5, 15.0, 64.0, 'Avaliação de acompanhamento 6', 'COMPLETED'),
        (8, 3, 2, '2025-05-22 10:20:00', 26.0, 14.5, 64.5, 'Avaliação de acompanhamento 7', 'COMPLETED'),
        (9, 3, 2, '2025-05-25 09:50:00', 26.5, 14.0, 65.0, 'Avaliação de acompanhamento 8', 'COMPLETED'),
-       (10, 3, 2, '2025-05-01 10:00:00', 22.5, 18.0, 60.0, 'Avaliação inicial', 'COMPLETED'),
-       (11, 3, 2, '2025-06-01 18:00:00', 22.5, 18.0, 60.0, 'Avaliação inicial', 'COMPLETED');
+       (10, 3, 2, '2025-06-01 10:00:00', 22.5, 18.0, 60.0, 'Avaliação inicial', 'COMPLETED'),
+       (11, 3, 2, '2025-07-01 18:00:00', 22.5, 18.0, 60.0, 'Avaliação inicial', 'COMPLETED');
 
 -- Populando tb_skin_fold
 INSERT INTO tb_skin_fold (id, assessment_id, fold, mm)

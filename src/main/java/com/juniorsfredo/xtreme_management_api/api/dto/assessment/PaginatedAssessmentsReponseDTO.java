@@ -1,4 +1,8 @@
 package com.juniorsfredo.xtreme_management_api.api.dto.assessment;
 
-public class PaginatedAssessmentsReponseDTO {
-}
+import java.util.List;
+
+public record PaginatedAssessmentsReponseDTO(
+        Integer totalPages,
+        Integer currentPage,
+        List<AssessmentsResponseDTO> assessments) {}

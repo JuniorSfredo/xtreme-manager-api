@@ -1,10 +1,10 @@
-package com.juniorsfredo.xtreme_management_api.infrastructure.config.annotations;
+package com.juniorsfredo.xtreme_management_api.infrastructure.config.validators;
 
-import com.juniorsfredo.xtreme_management_api.domain.annotations.ValidateCpf;
+import com.juniorsfredo.xtreme_management_api.domain.annotations.IsCpf;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class CpfValidator implements ConstraintValidator<ValidateCpf, String> {
+public class CpfValidator implements ConstraintValidator<IsCpf, String> {
 
     private static final String CPF_PLAIN_REGEX = "^\\d{11}$";
     private static final String CPF_FORMATTED_REGEX = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$";
