@@ -12,7 +12,7 @@ public class PlanReferenceDetailsDTO {
 
     private Long id;
 
-    private PlanTypes planType;
+    private PlanTypes plan;
 
     private BigDecimal value;
 }

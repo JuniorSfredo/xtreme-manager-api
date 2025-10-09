@@ -8,6 +8,9 @@ import com.juniorsfredo.xtreme_management_api.domain.models.Plan;
 import com.juniorsfredo.xtreme_management_api.domain.models.Subscription;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.PlanRepository;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.SubscriptionRepository;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Payout;
+import com.stripe.param.PayoutCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,5 +47,32 @@ public class SubscriptionService {
         Subscription newSubscription = this.subscriptionRepository.save(subscription);
 
         return subscriptionAssembler.toSubscriptionDetailsResponseDTO(newSubscription);
+    }
+
+    public boolean paymentSubscription(Long subsciptionId) {
+        Optional<Subscription> subscription = subscriptionRepository.findById(subsciptionId);
+        if (subscription.isEmpty()) throw new EntityNotFoundException("Subscription not found with id: " + subsciptionId);
+
+        PayoutCreateParams params =
+                PayoutCreateParams.builder().setAmount(1100L)
+                        .setCurrency("usd")
+                        .setSourceType(PayoutCreateParams.SourceType.BANK_ACCOUNT)
+                        .build();
+
+        try {
+            Payout payout = Payout.create(params);
+
+            if (payout.getStatus().equalsIgnoreCase("success")) {
+                return true;
+            }
+        } catch (StripeException e) {
+            System.out.println(e.getStripeError());
+        }
+
+        return false;
+    }
+
+    private Optional<Subscription> findSubscription(Long subsciptionId) {
+        return subscriptionRepository.findById(subsciptionId);
     }
 }
