@@ -1,19 +1,19 @@
 package com.juniorsfredo.xtreme_management_api.api.dto.references;
 
+import com.juniorsfredo.xtreme_management_api.domain.models.enums.PlanTypes;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class MemberReferenceDTO {
+public class PlanReferenceDTO {
 
-    @NotEmpty
+    @NotBlank
     private Long id;
 
-    @NotEmpty
-    @Size(min = 1, max = 150)
-    private String name;
+    @NotNull
+    private PlanTypes plan;
 }

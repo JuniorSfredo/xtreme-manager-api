@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,7 +28,7 @@ public class Subscription {
 
     @Column(name = "payment_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
+    private PaymentStatus paymentStatus = PaymentStatus.WAITING_PAYMENT;
 
     @JsonIgnore
     @ManyToOne
@@ -40,4 +39,9 @@ public class Subscription {
     @ManyToOne
     @JoinColumn(name = "plan_id")
     private Plan plan;
+
+    public void setExpirationDate() {
+        int plusMonths = plan.getPlan().getMonth();
+        this.expirationDate = LocalDateTime.now().plusMonths(plusMonths);
+    }
 }

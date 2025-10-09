@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class Plan {
     private PlanTypes plan;
 
     @Column(nullable = false)
-    private Double value;
+    private BigDecimal value;
 
     @OneToMany(mappedBy = "plan")
     private List<Subscription> subscriptions = new ArrayList<>();
