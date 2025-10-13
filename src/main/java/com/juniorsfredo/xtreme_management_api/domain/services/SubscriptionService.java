@@ -8,9 +8,10 @@ import com.juniorsfredo.xtreme_management_api.domain.models.Plan;
 import com.juniorsfredo.xtreme_management_api.domain.models.Subscription;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.PlanRepository;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.SubscriptionRepository;
+import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
-import com.stripe.model.Payout;
-import com.stripe.param.PayoutCreateParams;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,32 +45,41 @@ public class SubscriptionService {
         Subscription subscription = subscriptionAssembler.toSubscription(subsciptionRequest);
         subscription.setPlan(planOpt.get());
         subscription.setExpirationDate();
+
         Subscription newSubscription = this.subscriptionRepository.save(subscription);
 
         return subscriptionAssembler.toSubscriptionDetailsResponseDTO(newSubscription);
     }
 
-    public boolean paymentSubscription(Long subsciptionId) {
+    public boolean paymentSubscription(Long subsciptionId) throws StripeException {
         Optional<Subscription> subscription = subscriptionRepository.findById(subsciptionId);
         if (subscription.isEmpty()) throw new EntityNotFoundException("Subscription not found with id: " + subsciptionId);
 
-        PayoutCreateParams params =
-                PayoutCreateParams.builder().setAmount(1100L)
-                        .setCurrency("usd")
-                        .setSourceType(PayoutCreateParams.SourceType.BANK_ACCOUNT)
-                        .build();
+        SessionCreateParams params = SessionCreateParams.builder()
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setSuccessUrl("http://localhost:8080/success.html")
+                .setCancelUrl("http://localhost:8080/cancel.html")
+                .addLineItem(
+                        SessionCreateParams.LineItem.builder()
+                                .setQuantity(1L)
+                                .setPriceData(
+                                        SessionCreateParams.LineItem.PriceData.builder()
+                                                .setCurrency("usd")
+                                                .setUnitAmount(55L)
+                                                .setProductData(
+                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                .setName("Pagamento Único")
+                                                                .build()
+                                                )
+                                                .build()
+                                )
+                                .build()
+                )
+                .build();
 
-        try {
-            Payout payout = Payout.create(params);
-
-            if (payout.getStatus().equalsIgnoreCase("success")) {
-                return true;
-            }
-        } catch (StripeException e) {
-            System.out.println(e.getStripeError());
-        }
-
-        return false;
+        Session session = Session.create(params);
+        System.out.println(session.getUrl());
+        return true;
     }
 
     private Optional<Subscription> findSubscription(Long subsciptionId) {
