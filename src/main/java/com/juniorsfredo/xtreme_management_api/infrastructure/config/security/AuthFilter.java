@@ -1,5 +1,7 @@
 package com.juniorsfredo.xtreme_management_api.infrastructure.config.security;
 
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.UserNotFoundException;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.UserRepository;
@@ -8,49 +10,68 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class AuthFilter extends OncePerRequestFilter {
+
+    private HandlerExceptionResolver exceptionResolver;
 
     private final JwtService jwtService;
 
     private final UserRepository userRepository;
 
     @Autowired
-    public AuthFilter(JwtService jwtService, UserRepository userRepository) {
+    public AuthFilter(JwtService jwtService,
+                      UserRepository userRepository,
+                      @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver)
+    {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.exceptionResolver = exceptionResolver;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (checkIfEndpointIsNotPublic(request)) {
-            String token = recoveryToken(request);
-            if (token != null) {
-                String subject = jwtService.validateToken(token);
-                Optional<User> userOptional = userRepository.findByEmail(subject);
-                if (userOptional.isEmpty())
-                    throw new UserNotFoundException("User not found with email: " + subject);
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+    {
+        try {
+            if (checkIfEndpointIsNotPublic(request)) {
+                String token = recoveryToken(request);
+                if (token != null) {
+                    String subject = jwtService.validateToken(token);
+                    Optional<User> userOptional = userRepository.findByEmail(subject);
+                    if (userOptional.isEmpty())
+                        throw new UserNotFoundException("User not found with email: " + subject);
 
-                User user = userOptional.get();
+                    User user = userOptional.get();
 
-                Authentication authentication =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    Authentication authentication =
+                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
+            filterChain.doFilter(request, response);
+        } catch (Exception ex) {
+            log.error(String.valueOf(ex.getClass()));
+            exceptionResolver.resolveException(request, response, null, ex);
         }
-        filterChain.doFilter(request, response);
     }
 
     private String recoveryToken(HttpServletRequest request) {

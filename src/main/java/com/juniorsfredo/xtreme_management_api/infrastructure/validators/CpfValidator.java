@@ -1,6 +1,6 @@
-package com.juniorsfredo.xtreme_management_api.infrastructure.config.validators;
+package com.juniorsfredo.xtreme_management_api.infrastructure.validators;
 
-import com.juniorsfredo.xtreme_management_api.domain.annotations.IsCpf;
+import com.juniorsfredo.xtreme_management_api.core.validators.IsCpf;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

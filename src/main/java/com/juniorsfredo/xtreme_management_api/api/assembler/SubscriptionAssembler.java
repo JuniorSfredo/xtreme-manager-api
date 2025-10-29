@@ -5,6 +5,7 @@ import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionR
 import com.juniorsfredo.xtreme_management_api.domain.models.Subscription;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,6 +23,6 @@ public class SubscriptionAssembler {
     }
 
     public SubscriptionDetailsResponseDTO toSubscriptionDetailsResponseDTO(Subscription subscription) {
-        return  this.modelMapper.map(subscription, SubscriptionDetailsResponseDTO.class);
+        return this.modelMapper.map(subscription, SubscriptionDetailsResponseDTO.class);
     }
 }

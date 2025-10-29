@@ -3,36 +3,45 @@ package com.juniorsfredo.xtreme_management_api.domain.services;
 import com.juniorsfredo.xtreme_management_api.api.assembler.SubscriptionAssembler;
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionRequestDTO;
+import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
+import com.juniorsfredo.xtreme_management_api.domain.exceptions.BusinessException;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.EntityNotFoundException;
+import com.juniorsfredo.xtreme_management_api.domain.exceptions.SubscriptionAlreadyPaid;
 import com.juniorsfredo.xtreme_management_api.domain.models.Plan;
 import com.juniorsfredo.xtreme_management_api.domain.models.Subscription;
+import com.juniorsfredo.xtreme_management_api.domain.models.enums.PaymentStatus;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.PlanRepository;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.SubscriptionRepository;
-import com.stripe.Stripe;
-import com.stripe.exception.StripeException;
-import com.stripe.model.checkout.Session;
-import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class SubscriptionService {
 
-    private final PlanRepository planRepository;
+    private final UserService userService;
+    private PlanRepository planRepository;
 
     private SubscriptionRepository subscriptionRepository;
 
     private SubscriptionAssembler subscriptionAssembler;
 
+
+
     @Autowired
     public SubscriptionService(SubscriptionRepository subscriptionRepository,
-                               SubscriptionAssembler subscriptionAssembler, PlanRepository planRepository) {
+                               SubscriptionAssembler subscriptionAssembler,
+                               PlanRepository planRepository, UserService userService)
+    {
         this.subscriptionRepository = subscriptionRepository;
         this.subscriptionAssembler = subscriptionAssembler;
         this.planRepository = planRepository;
+        this.userService = userService;
     }
 
 
@@ -51,38 +60,37 @@ public class SubscriptionService {
         return subscriptionAssembler.toSubscriptionDetailsResponseDTO(newSubscription);
     }
 
-    public boolean paymentSubscription(Long subsciptionId) throws StripeException {
-        Optional<Subscription> subscription = subscriptionRepository.findById(subsciptionId);
-        if (subscription.isEmpty()) throw new EntityNotFoundException("Subscription not found with id: " + subsciptionId);
-
-        SessionCreateParams params = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:8080/success.html")
-                .setCancelUrl("http://localhost:8080/cancel.html")
-                .addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L)
-                                .setPriceData(
-                                        SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency("usd")
-                                                .setUnitAmount(55L)
-                                                .setProductData(
-                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("Pagamento Único")
-                                                                .build()
-                                                )
-                                                .build()
-                                )
-                                .build()
-                )
-                .build();
-
-        Session session = Session.create(params);
-        System.out.println(session.getUrl());
-        return true;
+    public Subscription getSubscriptionById(Long subscriptionId) {
+        return subscriptionRepository.findById(subscriptionId)
+                .orElseThrow(() -> new EntityNotFoundException("Subscription not found with id: " + subscriptionId));
     }
 
-    private Optional<Subscription> findSubscription(Long subsciptionId) {
-        return subscriptionRepository.findById(subsciptionId);
+    @Transactional
+    public void updatePaymentSubscription(Long subsciptionId) {
+        Subscription subscription = getSubscriptionById(subsciptionId);
+        subscription.setPaymentStatus(PaymentStatus.PAID);
+        subscriptionRepository.save(subscription);
+    }
+
+    public void verifyPaidSubscription(Subscription subscription) {
+        if (subscription.getPaymentStatus().equals(PaymentStatus.PAID))
+            throw new SubscriptionAlreadyPaid("Subscription with id + " + subscription.getId() + " is already paid.");
+    }
+
+    public Long getSubscriptionAmountCents(Subscription subscription) {
+        BigDecimal planAmount = subscription.getPlanAmount();
+        return planAmount.multiply(BigDecimal.valueOf(100)).longValue();
+    }
+
+    // TO DO
+    public void verifySubscriptionActive(Subscription subscription) {
+        Optional<Subscription> activeSubscription = subscriptionRepository.findByExpirationDateAfterNow(LocalDateTime.now());
+        if (activeSubscription.isPresent())
+            throw new BusinessException("There is already an active subscription at the moment.");
+    }
+
+    public List<SubscriptionDetailsResponseDTO> getSubscriptionsByUserId(Long userId) {
+        UserDetailsResponseDTO user = userService.getUserById(userId);
+        return subscriptionRepository.getAllSubscriptionsByUserId(userId);
     }
 }

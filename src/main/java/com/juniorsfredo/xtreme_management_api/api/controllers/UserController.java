@@ -4,9 +4,9 @@ import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDT
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserWeeklyStreaksResponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.services.UserService;
-import com.juniorsfredo.xtreme_management_api.domain.services.WorkoutRegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,12 +17,9 @@ public class UserController {
 
     private UserService userService;
 
-    private WorkoutRegisterService workoutRegisterService;
-
     @Autowired
-    public UserController(UserService userService, WorkoutRegisterService workoutRegisterService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.workoutRegisterService = workoutRegisterService;
     }
 
     @GetMapping()
@@ -31,9 +28,9 @@ public class UserController {
         return ResponseEntity.ok(usersResponse);
     }
 
+    @PreAuthorize("hasAnyRole('PERSONAL', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserDetailsResponseDTO> getUserById(@PathVariable Long id) {
-        workoutRegisterService.getWeeklyStreak();
         UserDetailsResponseDTO userResponse = userService.getUserById(id);
         return ResponseEntity.ok(userResponse);
     }
@@ -42,5 +39,11 @@ public class UserController {
     public ResponseEntity<UserWeeklyStreaksResponseDTO> getUserByIdStreaks(@PathVariable Long id) {
         UserWeeklyStreaksResponseDTO response = userService.getUserByIdWithStreaks(id);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDetailsResponseDTO> getAuthenticatedUser() {
+        UserDetailsResponseDTO user = userService.getAuthenticatedUser();
+        return ResponseEntity.ok(user);
     }
 }

@@ -8,6 +8,7 @@ import com.juniorsfredo.xtreme_management_api.domain.models.Workout;
 import com.juniorsfredo.xtreme_management_api.domain.models.WorkoutRegister;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.WorkoutRegisterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public class WorkoutRegisterService {
 
     @Autowired
     public WorkoutRegisterService(WorkoutRegisterRepository workoutRegisterRepository,
-                                  WorkoutService workoutService,
+                                  @Lazy WorkoutService workoutService,
                                   WorkoutRegisterAssembler workoutRegisterAssembler) {
         this.workoutRegisterRepository = workoutRegisterRepository;
         this.workoutService = workoutService;

@@ -20,7 +20,9 @@ import java.util.List;
 public class WorkoutService {
 
     private final ExerciseService exerciseService;
+
     private final MemberService memberService;
+
     private final PersonalService personalService;
 
     private WorkoutRepository workoutRepository;
@@ -33,7 +35,9 @@ public class WorkoutService {
     public WorkoutService(WorkoutRepository workoutRepository,
                           UserService userService,
                           WorkoutAssembler workoutAssembler,
-                          ExerciseService exerciseService, MemberService memberService, PersonalService personalService) {
+                          ExerciseService exerciseService,
+                          MemberService memberService,
+                          PersonalService personalService) {
         this.workoutRepository = workoutRepository;
         this.userService = userService;
         this.workoutAssembler = workoutAssembler;
@@ -56,7 +60,6 @@ public class WorkoutService {
         dto.setExercises(exerciseService.getExcercisesByWorkoutId(workoutId));
         return dto;
     }
-
 
     public Workout createWorkout(Long personalId, Long memberId, WorkoutRequestDTO workoutRequest) {
         Member member = memberService.getMemberById(memberId);

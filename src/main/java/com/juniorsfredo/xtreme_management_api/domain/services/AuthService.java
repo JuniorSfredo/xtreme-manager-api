@@ -2,7 +2,9 @@ package com.juniorsfredo.xtreme_management_api.domain.services;
 
 import com.juniorsfredo.xtreme_management_api.api.assembler.AuthAssembler;
 import com.juniorsfredo.xtreme_management_api.api.assembler.RoleAssembler;
+import com.juniorsfredo.xtreme_management_api.api.assembler.UserAssembler;
 import com.juniorsfredo.xtreme_management_api.api.dto.auth.*;
+import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserResponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidCredentialsException;
 import com.juniorsfredo.xtreme_management_api.domain.models.Role;
@@ -13,9 +15,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class AuthService {
@@ -24,24 +28,16 @@ public class AuthService {
 
     private final JwtService jwtService;
 
-    private final UserService userService;
-
-    private final AuthAssembler authAssembler;
-
-    private final RoleAssembler roleAssembler;
+    private final UserAssembler userAssembler;
 
     @Autowired
     public AuthService(AuthenticationConfiguration config,
                        JwtService jwtService,
-                       UserService userService,
-                       AuthAssembler authAssembler,
-                       RoleAssembler roleAssembler
+                       UserAssembler userAssembler
     ) throws Exception {
         this.authManager = config.getAuthenticationManager();
         this.jwtService = jwtService;
-        this.userService = userService;
-        this.authAssembler = authAssembler;
-        this.roleAssembler = roleAssembler;
+        this.userAssembler = userAssembler;
     }
 
     public AuthenticatedResponseDTO login(UserLoginDTO userBody)  {
@@ -53,7 +49,7 @@ public class AuthService {
 
             User user = (User) authentication.getPrincipal();
 
-            AuthenticatedUserResponseDTO authenticatedUser = authAssembler.userToAuthenticatedUserDTO(user);
+            UserDetailsResponseDTO authenticatedUser = userAssembler.toUserDetailsResponseDTO(user);
 
             String token = jwtService.generateToken(user);
             return new AuthenticatedResponseDTO(token, authenticatedUser);
@@ -62,21 +58,14 @@ public class AuthService {
         }
     }
 
-    public UserResponseDTO register(UserRegisterDTO userBody) {
-        List<Role> roleReferences =
-                userBody.getRoles()
-                        .stream()
-                        .map(roleAssembler::roleReferenceToRole)
-                        .toList();
-
-        User user = authAssembler.userRegisterToEntityDTO(userBody);
-        user.setRoles(roleReferences);
-        return userService.createUser(user);
+    public User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 
-    public AuthenticatedUserResponseDTO getUserByToken(String token) {
-        String tokenSubject = jwtService.validateToken(token);
-        User user = userService.findUserByEmail(tokenSubject);
-        return authAssembler.userToAuthenticatedUserDTO(user);
+    public String generateCodeToChangePassword() {
+        Random random = new Random();
+        int code = 100000 + random.nextInt(900000);
+        return String.valueOf(code);
     }
 }

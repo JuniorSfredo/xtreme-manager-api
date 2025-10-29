@@ -1,6 +1,7 @@
 package com.juniorsfredo.xtreme_management_api.api.assembler;
 
 import com.juniorsfredo.xtreme_management_api.api.dto.member.MemberRequestDTO;
+import com.juniorsfredo.xtreme_management_api.api.dto.references.MemberReferenceDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.Member;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,5 +19,9 @@ public class MemberAssembler {
 
     public Member toEntity(MemberRequestDTO member) {
         return mapper.map(member, Member.class);
+    }
+
+    public MemberReferenceDTO toMemberReferenceDTO(Member member) {
+        return mapper.map(member, MemberReferenceDTO.class);
     }
 }

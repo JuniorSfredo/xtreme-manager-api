@@ -1,6 +1,6 @@
 package com.juniorsfredo.xtreme_management_api.domain.models;
 
-import com.juniorsfredo.xtreme_management_api.domain.parsers.CpfParser;
+import com.juniorsfredo.xtreme_management_api.core.parsers.CpfParser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

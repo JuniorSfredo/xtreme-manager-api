@@ -9,17 +9,4 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/members")
 public class MemberController {
-
-    private MemberService memberService;
-
-    @Autowired
-    public MemberController(MemberService memberService) {
-        this.memberService = memberService;
-    }
-
-    @PostMapping("/{personalId}/register-member")
-    public ResponseEntity<?> registerMember(@PathVariable Long personalId, @RequestBody MemberRequestDTO member) {
-        memberService.registerMember(personalId, member);
-        return ResponseEntity.noContent().build();
-    }
 }

@@ -34,3 +34,4 @@ build/
 
 ### DotEnv ###
 .env
+.env.test

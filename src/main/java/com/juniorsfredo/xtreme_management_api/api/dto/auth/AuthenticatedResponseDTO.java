@@ -1,4 +1,6 @@
 package com.juniorsfredo.xtreme_management_api.api.dto.auth;
 
-public record AuthenticatedResponseDTO(String accessToken, AuthenticatedUserResponseDTO user) {
+import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
+
+public record AuthenticatedResponseDTO(String accessToken, UserDetailsResponseDTO user) {
 }

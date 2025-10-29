@@ -79,7 +79,7 @@ VALUES (1, 'MONTHLY', 99.90),
 
 -- Populando tb_subscription
 INSERT INTO tb_subscription (id, member_id, plan_id, expiration_date, payment_status, created_at)
-VALUES (1, 3, 1, '2025-06-10', 'PAGO', CURRENT_TIMESTAMP);
+VALUES (1, 3, 1, '2025-06-10', 'WAITING_PAYMENT', CURRENT_TIMESTAMP);
 
 -- Populando tb_exercise
 INSERT INTO tb_exercise (id, name, max_reps, min_reps, series_number)

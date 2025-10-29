@@ -44,6 +44,33 @@ public class User extends Person implements UserDetails {
         return this.password;
     }
 
+    public void setDefaultPassword() {
+        String cpf = this.getCpf();
+        String name = this.getName();
+
+        if (cpf == null) {
+            throw new IllegalArgumentException("CPF não pode ser nulo");
+        }
+
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nome não pode ser vazio");
+        }
+
+        String digitsOnlyCpf = cpf.replaceAll("\\D+", "");
+
+        if (digitsOnlyCpf.length() < 3) {
+            throw new IllegalArgumentException("Invalid CPF");
+        }
+
+        String first3Cpf = digitsOnlyCpf.substring(0, 3);
+
+        String firstName = name.trim().split("\\s+")[0];
+
+        String defaultPassword = first3Cpf + "@" + firstName;
+
+        setPassword(defaultPassword);
+    }
+
     @Override
     public String getUsername() {
         return this.email;

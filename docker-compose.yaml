@@ -1,22 +1,48 @@
-version: '3.8'
-
 services:
-  mysql:
-    image: mysql:8.4
-    container_name: spring_mysql
+  mysql-dev:
+    image: mysql:8.1
+    container_name: spring_mysql_dev
     env_file:
-      - .env
+      - /.env
     environment:
-      MYSQL_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PWD}
-      MYSQL_DATABASE: xtreme-management
+      MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${MYSQL_PORT}:3306"
+      - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data_dev:/var/lib/mysql
+
+  mysql-test:
+    image: mysql:8.1
+    container_name: spring_mysql_test
+    env_file:
+      - /.env.test
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PWD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${TEST_DB_USERNAME}
+      MYSQL_PASSWORD: ${TEST_DB_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data_test:/var/lib/mysql
+  redis:
+    env_file:
+      - /.env
+    image: redis:latest
+    container_name: spring_redis
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis_data:/data
     restart: unless-stopped
 
 volumes:
-  mysql_data:
+  mysql_data_dev:
+  mysql_data_test:
+  redis_data:

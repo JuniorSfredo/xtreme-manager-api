@@ -1,19 +1,30 @@
 package com.juniorsfredo.xtreme_management_api.infrastructure.config.security;
 
 import com.juniorsfredo.xtreme_management_api.api.cors.CorsConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 @Configuration
@@ -22,7 +33,10 @@ public class SecurityConfig {
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
             "/auth/login",
-            "/subscriptions"
+            "/subscriptions",
+            "/subscriptions/{subscriptionId}",
+            "/subscriptions/webhook",
+            "/subscriptions/users/{userId}"
     };
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
@@ -45,27 +59,32 @@ public class SecurityConfig {
     };
 
     public static final String[] ENDPOINTS_PERSONAL = {
+        "/personals/{personalId}/new-member"
     };
 
     public static final String[] ENDPOINTS_ADMIN = {
     };
 
-    AuthFilter authFilter;
-
     private final CorsConfig corsConfig;
 
 
+    private HandlerExceptionResolver exceptionResolver;
+
     @Autowired
-    public SecurityConfig(AuthFilter authFilter, CorsConfig corsConfig) {
-        this.authFilter = authFilter;
+    public SecurityConfig(CorsConfig corsConfig,
+                          @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver)
+    {
         this.corsConfig = corsConfig;
+        this.exceptionResolver = exceptionResolver;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthFilter authFilter, CorsConfigurationSource corsConfigurationSource) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
+                                                   AuthFilter authFilter,
+                                                   CorsConfigurationSource corsConfigurationSource) throws Exception {
         return httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable) // WARN: DONT PROD
+                .csrf(AbstractHttpConfigurer::disable) // WARN: DON'T PROD
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
@@ -75,6 +94,17 @@ public class SecurityConfig {
                         .requestMatchers(ENDPOINTS_MEMBER).hasRole("MEMBER")
                         .anyRequest().denyAll()
                 )
+                .exceptionHandling(customHandling -> {
+                    customHandling.authenticationEntryPoint((request,
+                                                             response,
+                                                             authException) ->
+                            exceptionResolver.resolveException(request, response, null, authException));
+
+                    customHandling.accessDeniedHandler((request,
+                                                        response,
+                                                        accessDeniedException) ->
+                            exceptionResolver.resolveException(request, response, null, accessDeniedException));
+                })
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

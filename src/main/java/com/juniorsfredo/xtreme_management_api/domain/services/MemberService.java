@@ -1,8 +1,8 @@
 package com.juniorsfredo.xtreme_management_api.domain.services;
 
 import com.juniorsfredo.xtreme_management_api.api.assembler.MemberAssembler;
-import com.juniorsfredo.xtreme_management_api.api.dto.member.MemberIdDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.member.MemberRequestDTO;
+import com.juniorsfredo.xtreme_management_api.api.dto.references.MemberReferenceDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.Member;
 import com.juniorsfredo.xtreme_management_api.domain.models.Personal;
 import com.juniorsfredo.xtreme_management_api.domain.models.Role;
@@ -12,15 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class MemberService {
 
     private final MemberAssembler memberAssembler;
+
     private MemberRepository memberRepository;
 
     private PersonalService personalService;
@@ -28,7 +26,10 @@ public class MemberService {
     private RoleService roleService;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository, PersonalService personalService, RoleService roleService, MemberAssembler memberAssembler) {
+    public MemberService(MemberRepository memberRepository,
+                         PersonalService personalService,
+                         RoleService roleService,
+                         MemberAssembler memberAssembler) {
         this.memberRepository = memberRepository;
         this.personalService = personalService;
         this.roleService = roleService;
@@ -45,28 +46,20 @@ public class MemberService {
         return memberRepository.findById(id);
     }
 
-    public void registerMember(Long personalId, MemberRequestDTO memberRequest) {
-        Personal personal = personalService.getPersonalById(personalId);
+    @Transactional
+    public MemberReferenceDTO createNewMember(Long personalId, MemberRequestDTO memberRequest) {
+        personalService.getPersonalById(personalId);
         Role roleMember = roleService.findRoleByName(RoleName.ROLE_MEMBER);
-        LocalDateTime now = LocalDateTime.now();
-        String pwd = this.generatePwd(memberRequest.getCpf(), memberRequest.getBirthDate());
         Member member = memberAssembler.toEntity(memberRequest);
-        member.setPassword(pwd);
-        member.setCreatedAt(now);
+        member.setDefaultPassword(); // Setting default password (3 initial digits CPF + @ + member first name)
+        member.setRoles(Collections.singletonList(roleMember));
+        Member savedMember = saveMember(member);
 
-
+        return memberAssembler.toMemberReferenceDTO(savedMember);
     }
 
     @Transactional
     protected Member saveMember(Member member) {
         return this.memberRepository.save(member);
-    }
-
-    private String generatePwd(String memberCpf, LocalDate birthDate) {
-        String splitCpf = memberCpf.substring(memberCpf.length() - 2);
-        String day = String.format("%02d", birthDate.getDayOfMonth());
-        String month = String.format("%02d", birthDate.getMonthValue());
-        String year = String.valueOf(birthDate.getYear());
-        return splitCpf + day + month + year;
     }
 }
