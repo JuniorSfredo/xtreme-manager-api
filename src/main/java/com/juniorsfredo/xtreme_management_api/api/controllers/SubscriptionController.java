@@ -9,8 +9,10 @@ import com.juniorsfredo.xtreme_management_api.domain.services.PaymentService;
 import com.juniorsfredo.xtreme_management_api.domain.services.SubscriptionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -20,13 +22,13 @@ public class SubscriptionController {
 
     private SubscriptionService subscriptionService;
 
-    private PaymentService stripeExternalService;
+    private PaymentService paymentService;
 
     @Autowired
     public SubscriptionController(SubscriptionService subscriptionService,
                                   PaymentService paymentService) {
         this.subscriptionService = subscriptionService;
-        this.stripeExternalService = paymentService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/users/{userId}")
@@ -47,7 +49,7 @@ public class SubscriptionController {
 
         Long centsSubscriptionAmount = subscriptionService.getSubscriptionAmountCents(subscription);
 
-        String paymentUrl = stripeExternalService.getStripePaymentUrl(
+        String paymentUrl = paymentService.getStripePaymentUrl(
             centsSubscriptionAmount,
             "subscriptionId",
             String.valueOf(subscription.getId())
@@ -62,9 +64,19 @@ public class SubscriptionController {
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader) {
 
-        PaymentDTO payment = stripeExternalService.processStripePaymentWebhook(payload, sigHeader);
-        subscriptionService.updatePaymentSubscription(payment.getSubscriptionId());
+        PaymentDTO payment = paymentService.processStripePaymentWebhook(payload, sigHeader);
+        SubscriptionDetailsResponseDTO subscription = subscriptionService.updatePaymentSubscription(payment.getSubscriptionId());
+        if (subscription != null) {
+            subscriptionService.sendEmitterPaymentSubscription(subscription);
+        }
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(path = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribePaymentEvent() {
+        SseEmitter emitter = new SseEmitter(0L);
+        subscriptionService.addEmitter(emitter);
+        return emitter;
     }
 }

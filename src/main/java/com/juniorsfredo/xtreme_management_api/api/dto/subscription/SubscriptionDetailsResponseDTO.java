@@ -6,6 +6,7 @@ import com.juniorsfredo.xtreme_management_api.api.dto.references.PlanReferenceDe
 import com.juniorsfredo.xtreme_management_api.domain.models.enums.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class SubscriptionDetailsResponseDTO {
 
     private Long id;

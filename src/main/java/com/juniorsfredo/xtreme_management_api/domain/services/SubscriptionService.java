@@ -15,23 +15,27 @@ import com.juniorsfredo.xtreme_management_api.domain.repositories.SubscriptionRe
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class SubscriptionService {
 
     private final UserService userService;
+
     private PlanRepository planRepository;
 
     private SubscriptionRepository subscriptionRepository;
 
     private SubscriptionAssembler subscriptionAssembler;
 
-
+    private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     @Autowired
     public SubscriptionService(SubscriptionRepository subscriptionRepository,
@@ -66,10 +70,11 @@ public class SubscriptionService {
     }
 
     @Transactional
-    public void updatePaymentSubscription(Long subsciptionId) {
-        Subscription subscription = getSubscriptionById(subsciptionId);
+    public SubscriptionDetailsResponseDTO updatePaymentSubscription(Long subscriptionId) {
+        Subscription subscription = getSubscriptionById(subscriptionId);
         subscription.setPaymentStatus(PaymentStatus.PAID);
-        subscriptionRepository.save(subscription);
+        Subscription updatedSubscription = subscriptionRepository.save(subscription);
+        return subscriptionAssembler.toSubscriptionDetailsResponseDTO(updatedSubscription);
     }
 
     public void verifyPaidSubscription(Subscription subscription) {
@@ -92,5 +97,23 @@ public class SubscriptionService {
     public List<SubscriptionDetailsResponseDTO> getSubscriptionsByUserId(Long userId) {
         UserDetailsResponseDTO user = userService.getUserById(userId);
         return subscriptionRepository.getAllSubscriptionsByUserId(userId);
+    }
+
+    public void addEmitter(SseEmitter emitter) {
+        emitters.add(emitter);
+        emitter.onCompletion(() -> emitters.remove(emitter));
+        emitter.onTimeout(() -> emitters.remove(emitter));
+    }
+
+    public void sendEmitterPaymentSubscription(SubscriptionDetailsResponseDTO subscription) {
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.send(subscription);
+            } catch (IOException e) {
+                emitter.complete();
+                emitters.remove(emitter);
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

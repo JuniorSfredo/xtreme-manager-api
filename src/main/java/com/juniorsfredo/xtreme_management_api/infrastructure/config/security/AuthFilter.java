@@ -69,7 +69,7 @@ public class AuthFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (Exception ex) {
-            log.error(String.valueOf(ex.getClass()));
+            ex.printStackTrace();
             exceptionResolver.resolveException(request, response, null, ex);
         }
     }

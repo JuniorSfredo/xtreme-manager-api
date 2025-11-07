@@ -100,6 +100,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, errorResponse, new HttpHeaders(), status, request);
     }
 
+    @ExceptionHandler({BusinessException.class})
+    public ResponseEntity<?> handleBusinessException(BusinessException e, WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        GlobalErrorResponse errorResponse = newErrorResponse(status.value(), e.getMessage());
+        return handleExceptionInternal(e, errorResponse, new HttpHeaders(), status, request);
+    }
+
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex,
