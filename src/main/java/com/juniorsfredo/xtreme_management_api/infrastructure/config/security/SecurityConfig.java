@@ -33,15 +33,14 @@ public class SecurityConfig {
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
             "/auth/login",
-            "/subscriptions",
-            "/subscriptions/{subscriptionId}",
             "/subscriptions/webhook",
-            "/subscriptions/users/{userId}",
-            "/subscriptions/sse",
             "/success.html"
     };
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
+            "/subscriptions",
+            "/subscriptions/{subscriptionId}",
+            "/subscriptions/users/{userId}",
             "/users/{id}",
             "/assessments/{id}",
             "/assessments/users/{userId}",

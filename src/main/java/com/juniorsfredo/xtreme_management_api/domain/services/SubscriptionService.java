@@ -15,14 +15,11 @@ import com.juniorsfredo.xtreme_management_api.domain.repositories.SubscriptionRe
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class SubscriptionService {
@@ -35,19 +32,17 @@ public class SubscriptionService {
 
     private SubscriptionAssembler subscriptionAssembler;
 
-    private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
-
     @Autowired
     public SubscriptionService(SubscriptionRepository subscriptionRepository,
                                SubscriptionAssembler subscriptionAssembler,
-                               PlanRepository planRepository, UserService userService)
+                               PlanRepository planRepository,
+                               UserService userService)
     {
         this.subscriptionRepository = subscriptionRepository;
         this.subscriptionAssembler = subscriptionAssembler;
         this.planRepository = planRepository;
         this.userService = userService;
     }
-
 
     @Transactional
     public SubscriptionDetailsResponseDTO createSubscription(SubscriptionRequestDTO subsciptionRequest) {
@@ -57,7 +52,6 @@ public class SubscriptionService {
 
         Subscription subscription = subscriptionAssembler.toSubscription(subsciptionRequest);
         subscription.setPlan(planOpt.get());
-        subscription.setExpirationDate();
 
         Subscription newSubscription = this.subscriptionRepository.save(subscription);
 
@@ -70,11 +64,12 @@ public class SubscriptionService {
     }
 
     @Transactional
-    public SubscriptionDetailsResponseDTO updatePaymentSubscription(Long subscriptionId) {
+    public void updatePaymentSubscription(Long subscriptionId) {
         Subscription subscription = getSubscriptionById(subscriptionId);
         subscription.setPaymentStatus(PaymentStatus.PAID);
+        subscription.setExpirationDate();
         Subscription updatedSubscription = subscriptionRepository.save(subscription);
-        return subscriptionAssembler.toSubscriptionDetailsResponseDTO(updatedSubscription);
+        subscriptionAssembler.toSubscriptionDetailsResponseDTO(updatedSubscription);
     }
 
     public void verifyPaidSubscription(Subscription subscription) {
@@ -87,33 +82,8 @@ public class SubscriptionService {
         return planAmount.multiply(BigDecimal.valueOf(100)).longValue();
     }
 
-    // TO DO
-    public void verifySubscriptionActive(Subscription subscription) {
-        Optional<Subscription> activeSubscription = subscriptionRepository.findByExpirationDateAfterNow(LocalDateTime.now());
-        if (activeSubscription.isPresent())
-            throw new BusinessException("There is already an active subscription at the moment.");
-    }
-
     public List<SubscriptionDetailsResponseDTO> getSubscriptionsByUserId(Long userId) {
         UserDetailsResponseDTO user = userService.getUserById(userId);
         return subscriptionRepository.getAllSubscriptionsByUserId(userId);
-    }
-
-    public void addEmitter(SseEmitter emitter) {
-        emitters.add(emitter);
-        emitter.onCompletion(() -> emitters.remove(emitter));
-        emitter.onTimeout(() -> emitters.remove(emitter));
-    }
-
-    public void sendEmitterPaymentSubscription(SubscriptionDetailsResponseDTO subscription) {
-        for (SseEmitter emitter : emitters) {
-            try {
-                emitter.send(subscription);
-            } catch (IOException e) {
-                emitter.complete();
-                emitters.remove(emitter);
-                throw new RuntimeException(e);
-            }
-        }
     }
 }

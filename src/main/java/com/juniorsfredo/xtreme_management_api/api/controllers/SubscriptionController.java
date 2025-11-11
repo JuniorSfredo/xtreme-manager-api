@@ -5,6 +5,7 @@ import com.juniorsfredo.xtreme_management_api.api.dto.subscription.PaymentSubscr
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionRequestDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.Subscription;
+import com.juniorsfredo.xtreme_management_api.domain.services.AuthService;
 import com.juniorsfredo.xtreme_management_api.domain.services.PaymentService;
 import com.juniorsfredo.xtreme_management_api.domain.services.SubscriptionService;
 import jakarta.validation.Valid;
@@ -65,18 +66,8 @@ public class SubscriptionController {
             @RequestHeader("Stripe-Signature") String sigHeader) {
 
         PaymentDTO payment = paymentService.processStripePaymentWebhook(payload, sigHeader);
-        SubscriptionDetailsResponseDTO subscription = subscriptionService.updatePaymentSubscription(payment.getSubscriptionId());
-        if (subscription != null) {
-            subscriptionService.sendEmitterPaymentSubscription(subscription);
-        }
+        subscriptionService.updatePaymentSubscription(payment.getSubscriptionId());
 
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping(path = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribePaymentEvent() {
-        SseEmitter emitter = new SseEmitter(0L);
-        subscriptionService.addEmitter(emitter);
-        return emitter;
     }
 }
