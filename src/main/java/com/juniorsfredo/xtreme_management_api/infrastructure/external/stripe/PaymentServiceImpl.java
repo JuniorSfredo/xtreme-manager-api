@@ -1,7 +1,7 @@
-package com.juniorsfredo.xtreme_management_api.infrastructure.services.stripe;
+package com.juniorsfredo.xtreme_management_api.infrastructure.external.stripe;
 
 import com.juniorsfredo.xtreme_management_api.api.dto.stripe.PaymentDTO;
-import com.juniorsfredo.xtreme_management_api.domain.services.PaymentService;
+import com.juniorsfredo.xtreme_management_api.domain.ports.PaymentService;
 import com.juniorsfredo.xtreme_management_api.infrastructure.exceptions.ExternalServiceException;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;

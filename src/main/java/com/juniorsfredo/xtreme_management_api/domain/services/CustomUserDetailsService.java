@@ -1,6 +1,6 @@
 package com.juniorsfredo.xtreme_management_api.domain.services;
 
-import com.juniorsfredo.xtreme_management_api.domain.repositories.UserRepository;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

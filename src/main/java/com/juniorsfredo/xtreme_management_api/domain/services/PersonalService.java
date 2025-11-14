@@ -2,7 +2,7 @@ package com.juniorsfredo.xtreme_management_api.domain.services;
 
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.EntityNotFoundException;
 import com.juniorsfredo.xtreme_management_api.domain.models.Personal;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.PersonalRepository;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.PersonalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

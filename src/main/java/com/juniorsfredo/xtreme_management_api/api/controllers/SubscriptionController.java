@@ -5,15 +5,12 @@ import com.juniorsfredo.xtreme_management_api.api.dto.subscription.PaymentSubscr
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionRequestDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.Subscription;
-import com.juniorsfredo.xtreme_management_api.domain.services.AuthService;
-import com.juniorsfredo.xtreme_management_api.domain.services.PaymentService;
+import com.juniorsfredo.xtreme_management_api.domain.ports.PaymentService;
 import com.juniorsfredo.xtreme_management_api.domain.services.SubscriptionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 

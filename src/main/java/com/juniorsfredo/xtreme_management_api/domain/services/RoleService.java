@@ -4,7 +4,7 @@ import com.juniorsfredo.xtreme_management_api.domain.exceptions.EntityNotFoundEx
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidDataException;
 import com.juniorsfredo.xtreme_management_api.domain.models.Role;
 import com.juniorsfredo.xtreme_management_api.domain.models.enums.RoleName;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.RoleRepository;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.RoleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

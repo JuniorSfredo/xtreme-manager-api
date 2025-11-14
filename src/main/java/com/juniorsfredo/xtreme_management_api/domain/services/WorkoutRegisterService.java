@@ -6,7 +6,7 @@ import com.juniorsfredo.xtreme_management_api.api.dto.workout.WorkoutRegisterReq
 import com.juniorsfredo.xtreme_management_api.api.dto.workoutRegister.PaginatedWorkoutRegisterDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.Workout;
 import com.juniorsfredo.xtreme_management_api.domain.models.WorkoutRegister;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.WorkoutRegisterRepository;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.WorkoutRegisterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;

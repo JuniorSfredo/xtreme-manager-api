@@ -6,7 +6,7 @@ import com.juniorsfredo.xtreme_management_api.api.dto.assessment.AssessmentsResp
 import com.juniorsfredo.xtreme_management_api.api.dto.assessment.PaginatedAssessmentsReponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.AssessmentNotFoundException;
 import com.juniorsfredo.xtreme_management_api.domain.models.Assessment;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.AssessmentRepository;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.AssessmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

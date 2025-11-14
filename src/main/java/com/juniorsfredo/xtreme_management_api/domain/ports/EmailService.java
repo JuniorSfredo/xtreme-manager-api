@@ -1,4 +1,4 @@
-package com.juniorsfredo.xtreme_management_api.domain.services;
+package com.juniorsfredo.xtreme_management_api.domain.ports;
 
 public interface EmailService {
 

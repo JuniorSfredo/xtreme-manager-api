@@ -1,6 +1,6 @@
-package com.juniorsfredo.xtreme_management_api.infrastructure.services.mailjet;
+package com.juniorsfredo.xtreme_management_api.infrastructure.external.mailjet;
 
-import com.juniorsfredo.xtreme_management_api.domain.services.EmailService;
+import com.juniorsfredo.xtreme_management_api.domain.ports.EmailService;
 import com.juniorsfredo.xtreme_management_api.infrastructure.exceptions.ExternalServiceException;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;

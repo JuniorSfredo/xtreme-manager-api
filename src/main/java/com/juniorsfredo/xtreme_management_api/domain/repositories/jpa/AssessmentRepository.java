@@ -1,8 +1,7 @@
-package com.juniorsfredo.xtreme_management_api.domain.repositories;
+package com.juniorsfredo.xtreme_management_api.domain.repositories.jpa;
 
 import com.juniorsfredo.xtreme_management_api.domain.models.Assessment;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
