@@ -5,15 +5,14 @@ import com.juniorsfredo.xtreme_management_api.api.dto.subscription.PaymentSubscr
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionRequestDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.Subscription;
+import com.juniorsfredo.xtreme_management_api.domain.models.User;
 import com.juniorsfredo.xtreme_management_api.domain.services.AuthService;
 import com.juniorsfredo.xtreme_management_api.domain.services.PaymentService;
 import com.juniorsfredo.xtreme_management_api.domain.services.SubscriptionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -25,11 +24,15 @@ public class SubscriptionController {
 
     private PaymentService paymentService;
 
+    private AuthService authService;
+
     @Autowired
     public SubscriptionController(SubscriptionService subscriptionService,
-                                  PaymentService paymentService) {
+                                  PaymentService paymentService,
+                                  AuthService authService) {
         this.subscriptionService = subscriptionService;
         this.paymentService = paymentService;
+        this.authService = authService;
     }
 
     @GetMapping("/users/{userId}")
@@ -45,6 +48,8 @@ public class SubscriptionController {
 
     @PutMapping("/{subscriptionId}")
     public ResponseEntity<PaymentSubscriptionResponseDTO> paymentSubscription(@PathVariable Long subscriptionId) {
+        User user = authService.getAuthenticatedUser();
+
         Subscription subscription = subscriptionService.getSubscriptionById(subscriptionId);
         subscriptionService.verifyPaidSubscription(subscription);
 
