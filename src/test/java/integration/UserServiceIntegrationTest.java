@@ -5,7 +5,6 @@ import com.juniorsfredo.xtreme_management_api.api.dto.references.RoleReferenceDT
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.UserNotFoundException;
 import com.juniorsfredo.xtreme_management_api.domain.models.enums.RoleName;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.UserRepository;
 import com.juniorsfredo.xtreme_management_api.domain.services.UserService;
 import com.juniorsfredo.xtreme_management_api.infrastructure.config.dotenv.DotenvApplicationContextInitializer;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,7 +1,6 @@
-package com.juniorsfredo.xtreme_management_api.domain.services;
+package com.juniorsfredo.xtreme_management_api.domain.ports;
 
 import com.juniorsfredo.xtreme_management_api.api.dto.stripe.PaymentDTO;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface PaymentService {
 

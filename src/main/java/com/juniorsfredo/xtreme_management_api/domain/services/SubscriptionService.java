@@ -4,20 +4,18 @@ import com.juniorsfredo.xtreme_management_api.api.assembler.SubscriptionAssemble
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionDetailsResponseDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionRequestDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
-import com.juniorsfredo.xtreme_management_api.domain.exceptions.BusinessException;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.EntityNotFoundException;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.SubscriptionAlreadyPaid;
 import com.juniorsfredo.xtreme_management_api.domain.models.Plan;
 import com.juniorsfredo.xtreme_management_api.domain.models.Subscription;
 import com.juniorsfredo.xtreme_management_api.domain.models.enums.PaymentStatus;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.PlanRepository;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.SubscriptionRepository;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.PlanRepository;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.SubscriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

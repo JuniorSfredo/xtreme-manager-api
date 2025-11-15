@@ -10,7 +10,7 @@ import com.juniorsfredo.xtreme_management_api.domain.exceptions.UnauthorizedExce
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.UserNotFoundException;
 import com.juniorsfredo.xtreme_management_api.domain.models.*;
 import com.juniorsfredo.xtreme_management_api.domain.models.enums.RoleName;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.WorkoutRepository;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.WorkoutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

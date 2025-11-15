@@ -4,21 +4,14 @@ import com.juniorsfredo.xtreme_management_api.api.dto.streak.WeeklyStreakDTO;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.*;
 import com.juniorsfredo.xtreme_management_api.api.assembler.UserAssembler;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidDataException;
-import com.juniorsfredo.xtreme_management_api.domain.exceptions.UserAlreadyExistsException;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.UserNotFoundException;
-import com.juniorsfredo.xtreme_management_api.domain.models.Role;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
-import com.juniorsfredo.xtreme_management_api.domain.models.enums.RoleName;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.UserRepository;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {

@@ -2,11 +2,8 @@ package com.juniorsfredo.xtreme_management_api.domain.services;
 
 import com.juniorsfredo.xtreme_management_api.api.assembler.ExerciseAssembler;
 import com.juniorsfredo.xtreme_management_api.api.dto.exercise.ExerciseDetailsResponseDTO;
-import com.juniorsfredo.xtreme_management_api.api.dto.exercise.ExerciseRequestDTO;
-import com.juniorsfredo.xtreme_management_api.domain.exceptions.ExerciseAlreadyExistsException;
 import com.juniorsfredo.xtreme_management_api.domain.models.Exercise;
-import com.juniorsfredo.xtreme_management_api.domain.repositories.ExerciseRepository;
-import org.springframework.dao.DataIntegrityViolationException;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.ExerciseRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
