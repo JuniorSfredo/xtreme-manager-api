@@ -25,24 +25,24 @@ public class MailjetServiceImpl implements EmailService {
     @Override
     public void sendEmail(String to, String subject, String body) {
         try {
-            MailjetClient client = new MailjetClient(mailjetPublicKey, mailjetPrivateKey);
-
-            MailjetRequest request = new MailjetRequest(Emailv31.resource)
+            MailjetClient client;
+            MailjetRequest request;
+            MailjetResponse response;
+            client = new MailjetClient(mailjetPublicKey, mailjetPrivateKey);
+            request = new MailjetRequest(Emailv31.resource)
                     .property(Emailv31.MESSAGES, new JSONArray()
                             .put(new JSONObject()
                                     .put(Emailv31.Message.FROM, new JSONObject()
                                             .put("Email", senderEmail)
-                                            .put("Name", "Me"))
+                                            .put("Name", "Mailjet Pilot"))
                                     .put(Emailv31.Message.TO, new JSONArray()
                                             .put(new JSONObject()
                                                     .put("Email", to)
-                                                    .put("Name", "Recipient")))
-                                    .put(Emailv31.Message.SUBJECT, subject)
-                                    .put(Emailv31.Message.TEXTPART, body)
-                                    .put(Emailv31.Message.HTMLPART, body)
-                            ));
-
-            MailjetResponse response = client.post(request);
+                                                    .put("Name", "passenger 1")))
+                                    .put(Emailv31.Message.SUBJECT, "Your email flight plan!")
+                                    .put(Emailv31.Message.TEXTPART, "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!")
+                                    .put(Emailv31.Message.HTMLPART, "<h3>Dear passenger 1, welcome to <a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3><br />May the delivery force be with you!")));
+            response = client.post(request);
             System.out.println(response.getStatus());
             System.out.println(response.getData());
 
