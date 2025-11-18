@@ -1,14 +1,11 @@
 package com.juniorsfredo.xtreme_management_api.domain.services;
 
-import com.juniorsfredo.xtreme_management_api.api.assembler.AuthAssembler;
-import com.juniorsfredo.xtreme_management_api.api.assembler.RoleAssembler;
 import com.juniorsfredo.xtreme_management_api.api.assembler.UserAssembler;
 import com.juniorsfredo.xtreme_management_api.api.dto.auth.*;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
-import com.juniorsfredo.xtreme_management_api.api.dto.user.UserResponseDTO;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidCredentialsException;
-import com.juniorsfredo.xtreme_management_api.domain.models.Role;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
+import com.juniorsfredo.xtreme_management_api.domain.repositories.cache.ResetPasswordCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +15,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Random;
 
 @Service
@@ -30,14 +26,18 @@ public class AuthService {
 
     private final UserAssembler userAssembler;
 
+    private final ResetPasswordCache resetPasswordCache;
+
     @Autowired
     public AuthService(AuthenticationConfiguration config,
                        JwtService jwtService,
-                       UserAssembler userAssembler
+                       UserAssembler userAssembler,
+                       ResetPasswordCache resetPasswordCache
     ) throws Exception {
         this.authManager = config.getAuthenticationManager();
         this.jwtService = jwtService;
         this.userAssembler = userAssembler;
+        this.resetPasswordCache = resetPasswordCache;
     }
 
     public AuthenticatedResponseDTO login(UserLoginDTO userBody)  {
@@ -67,5 +67,14 @@ public class AuthService {
         Random random = new Random();
         int code = 100000 + random.nextInt(900000);
         return String.valueOf(code);
+    }
+
+    public void saveSessionToken(Long userId, String email) {
+        String token = jwtService.generateSessionTokenResetPassword(email);
+        resetPasswordCache.saveSessionToken(userId, token);
+    }
+
+    public void saveCode(Long userId, String code) {
+        resetPasswordCache.saveCode(userId, code);
     }
 }

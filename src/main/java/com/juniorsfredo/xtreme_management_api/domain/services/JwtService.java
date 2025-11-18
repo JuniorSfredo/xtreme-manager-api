@@ -5,8 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidAuthorizationHeaderException;
-import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidCredentialsException;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +16,17 @@ import java.util.List;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "4Z^XrroxR@dWxqf$mTTKwW$!@#qGr4P";
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${resetpwd.secret}")
+    private String resetPwdSecretKey;
 
     private static final String ISSUER = "xtreme-management-api";
 
     public String generateToken(User userData) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
             List<String> roleNames = userData.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
@@ -42,7 +46,7 @@ public class JwtService {
 
     public String validateToken(String token) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
             return JWT.require(algorithm)
                     .withIssuer(ISSUER)
                     .build()
@@ -62,6 +66,19 @@ public class JwtService {
         }
 
         throw new InvalidAuthorizationHeaderException("Authorization header is missing or invalid.");
+    }
+
+    public String generateSessionTokenResetPassword(String email) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(resetPwdSecretKey);
+            return JWT.create()
+                    .withIssuer(ISSUER)
+                    .withExpiresAt(expirationDate())
+                    .withSubject(email)
+                    .sign(algorithm);
+        } catch (JWTCreationException exception) {
+            throw new JWTCreationException("Error to generate session token", exception);
+        }
     }
 
     private Instant expirationDate() {

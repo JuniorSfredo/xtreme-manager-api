@@ -73,4 +73,9 @@ public class UserService {
         user.setPassword(userPassword.getNewPassword());
         userRepository.save(user);
     }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
 }

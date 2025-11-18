@@ -7,4 +7,10 @@ public interface ResetPasswordCache {
     void saveCode(Long userId, String code);
 
     void deleteCode(Long userId);
+
+    void saveSessionToken(Long userId, String sessionToken);
+
+    String getSessionToken(Long userId);
+
+    void deleteSessionToken(Long userId);
 }
