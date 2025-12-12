@@ -10,8 +10,10 @@ import com.mailjet.client.resource.Emailv31;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-public class MailjetServiceImpl implements EmailService {
+@Component
+public class EmailServiceImpl implements EmailService {
 
     @Value("${MAILJET_PUB_KEY}")
     private String mailjetPublicKey;
@@ -37,11 +39,10 @@ public class MailjetServiceImpl implements EmailService {
                                             .put("Name", "Mailjet Pilot"))
                                     .put(Emailv31.Message.TO, new JSONArray()
                                             .put(new JSONObject()
-                                                    .put("Email", to)
+                                                    .put("Email", "gilvan.sfr@gmail.com")
                                                     .put("Name", "passenger 1")))
-                                    .put(Emailv31.Message.SUBJECT, "Your email flight plan!")
-                                    .put(Emailv31.Message.TEXTPART, "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!")
-                                    .put(Emailv31.Message.HTMLPART, "<h3>Dear passenger 1, welcome to <a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3><br />May the delivery force be with you!")));
+                                    .put(Emailv31.Message.SUBJECT, subject)
+                                    .put(Emailv31.Message.HTMLPART, body)));
             response = client.post(request);
             System.out.println(response.getStatus());
             System.out.println(response.getData());

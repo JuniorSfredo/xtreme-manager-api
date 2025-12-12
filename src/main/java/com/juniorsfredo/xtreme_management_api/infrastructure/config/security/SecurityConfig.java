@@ -46,7 +46,6 @@ public class SecurityConfig {
             "/assessments/{id}",
             "/assessments/users/{userId}",
             "/assessments/users/{userId}/latest-three",
-            "/auth/user/get-by-token",
             "/workouts/users/{userId}",
             "/workouts/{id}",
             "/register-workout",

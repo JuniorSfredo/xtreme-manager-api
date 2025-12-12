@@ -46,11 +46,14 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberReferenceDTO createNewMember(Long personalId, MemberRequestDTO memberRequest) {
+    public MemberReferenceDTO createNewMember(Long personalId, MemberRequestDTO memberRequest)  {
         personalService.getPersonalById(personalId);
         Role roleMember = roleService.findRoleByName(RoleName.ROLE_MEMBER);
         Member member = memberAssembler.toEntity(memberRequest);
-        member.setDefaultPassword(); // Setting default password (3 initial digits CPF + @ + member first name)
+
+        // Setting default password (3 initial digits CPF + @ + member first name)
+        member.setDefaultPassword();
+
         member.setRoles(Collections.singletonList(roleMember));
         Member savedMember = saveMember(member);
 

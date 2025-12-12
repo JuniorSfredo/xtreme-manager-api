@@ -23,16 +23,16 @@ public class AuthController {
 
     private final UserService userService;
 
-    // private final EmailService emailService;
+    private final EmailService emailService;
 
     @Autowired
     public AuthController(AuthService authService,
-                          UserService userService
-                          //EmailService emailService
+                          UserService userService,
+                          EmailService emailService
     ) {
         this.authService = authService;
         this.userService = userService;
-        // this.emailService = emailService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/login")
@@ -50,14 +50,18 @@ public class AuthController {
 
         User user = userService.getUserByEmail(email);
 
-        System.out.println(user.getId());
         String code = authService.generateCodeToChangePassword();
+        authService.saveCode(user.getId(), code);
 
-                authService.saveCode(user.getId(), code);
-
-//        CompletableFuture<Void> sendEmailFuture = CompletableFuture.runAsync(() ->
-//                emailService.sendEmail(email, "Código para redefinir sua senha", code)
-//        );
+        CompletableFuture<Void> sendEmailFuture = CompletableFuture.runAsync(() ->
+                emailService.sendEmail(
+                        email,
+                        "Seu código único para redefinir a senha.",
+                        "Insira o código abaixo para redefinir sua senha! <br>" +
+                              "Seu código único: <b>" + code + "</b> <br><br>" +
+                              "<b>IMPORTANTE: </b> caso não tenha feito o pedido para redefinição de senha, ignore essa mensagem."
+                )
+        );
 
         authService.saveSessionToken(user.getId(), email);
 

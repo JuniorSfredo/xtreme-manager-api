@@ -6,7 +6,6 @@ import com.juniorsfredo.xtreme_management_api.api.dto.user.UserWeeklyStreaksResp
 import com.juniorsfredo.xtreme_management_api.domain.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +27,6 @@ public class UserController {
         return ResponseEntity.ok(usersResponse);
     }
 
-    @PreAuthorize("hasAnyRole('PERSONAL', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserDetailsResponseDTO> getUserById(@PathVariable Long id) {
         UserDetailsResponseDTO userResponse = userService.getUserById(id);
