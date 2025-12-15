@@ -35,7 +35,9 @@ public class SecurityConfig {
             "/auth/login",
             "/subscriptions/webhook",
             "/success.html",
-            "/auth/send-code-reset-password"
+            "/auth/send-code-reset-password",
+            "/auth/validate-reset-code",
+            "/auth/reset-password",
     };
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {

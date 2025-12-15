@@ -1,4 +1,4 @@
-package com.juniorsfredo.xtreme_management_api.domain.ports;
+package com.juniorsfredo.xtreme_management_api.domain.services;
 
 import org.springframework.stereotype.Service;
 
