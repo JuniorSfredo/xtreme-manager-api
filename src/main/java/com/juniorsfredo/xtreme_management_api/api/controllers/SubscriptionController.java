@@ -6,7 +6,7 @@ import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionD
 import com.juniorsfredo.xtreme_management_api.api.dto.subscription.SubscriptionRequestDTO;
 import com.juniorsfredo.xtreme_management_api.domain.models.Subscription;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
-import com.juniorsfredo.xtreme_management_api.domain.ports.PaymentService;
+import com.juniorsfredo.xtreme_management_api.domain.services.PaymentService;
 import com.juniorsfredo.xtreme_management_api.domain.services.AuthService;
 import com.juniorsfredo.xtreme_management_api.domain.services.SubscriptionService;
 import jakarta.validation.Valid;

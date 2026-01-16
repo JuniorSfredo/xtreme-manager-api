@@ -16,8 +16,6 @@ public class ResetPasswordCacheImpl implements ResetPasswordCache {
 
     private static final String SAVE_CODE_PREFIX_KEY = "usr-reset-code:";
 
-    private static final String SAVE_SESSION_PREFIX_KEY = "usr-session-reset-code:";
-
     @Autowired
     public ResetPasswordCacheImpl(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -36,23 +34,8 @@ public class ResetPasswordCacheImpl implements ResetPasswordCache {
 
     @Override
     public void deleteCode(Long userId) {
-
-    }
-
-    @Override
-    public void saveSessionToken(Long userId, String sessionToken) {
-        String key = SAVE_SESSION_PREFIX_KEY + userId;
-        this.save(key, sessionToken, Duration.ofMinutes(5));
-    }
-
-    @Override
-    public String getSessionToken(Long userId) {
-        return "";
-    }
-
-    @Override
-    public void deleteSessionToken(Long userId) {
-
+        String key = SAVE_CODE_PREFIX_KEY + userId;
+        redisTemplate.delete(key);
     }
 
     private void save(String key, String value, @Nullable Duration minutes) {

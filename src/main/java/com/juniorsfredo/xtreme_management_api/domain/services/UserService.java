@@ -9,6 +9,7 @@ import com.juniorsfredo.xtreme_management_api.domain.models.User;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,20 +63,17 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
-    public void changeUserPassword(UserPasswordDTO userPassword) {
-
-        User user = authService.getAuthenticatedUser();
-
-        if (!user.getPassword().equals(userPassword.getOldPassword())) {
-            throw new InvalidDataException("Old password is invalid");
-        }
-
-        user.setPassword(userPassword.getNewPassword());
-        userRepository.save(user);
+    @Transactional
+    public void changePassword(Long userId, String encodedPassword) {
+        userRepository.updatePassword(userId, encodedPassword);
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
+        return this.findUserByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

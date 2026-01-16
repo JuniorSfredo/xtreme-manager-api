@@ -35,7 +35,9 @@ public class SecurityConfig {
             "/auth/login",
             "/subscriptions/webhook",
             "/success.html",
-            "/auth/send-code-reset-password"
+            "/auth/send-code-reset-password",
+            "/auth/validate-reset-code",
+            "/auth/reset-password",
     };
 
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
@@ -46,7 +48,6 @@ public class SecurityConfig {
             "/assessments/{id}",
             "/assessments/users/{userId}",
             "/assessments/users/{userId}/latest-three",
-            "/auth/user/get-by-token",
             "/workouts/users/{userId}",
             "/workouts/{id}",
             "/register-workout",

@@ -1,6 +1,6 @@
 package com.juniorsfredo.xtreme_management_api.infrastructure.external.mailjet;
 
-import com.juniorsfredo.xtreme_management_api.domain.ports.EmailService;
+import com.juniorsfredo.xtreme_management_api.domain.services.EmailService;
 import com.juniorsfredo.xtreme_management_api.infrastructure.exceptions.ExternalServiceException;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
@@ -10,8 +10,10 @@ import com.mailjet.client.resource.Emailv31;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-public class MailjetServiceImpl implements EmailService {
+@Component
+public class EmailServiceImpl implements EmailService {
 
     @Value("${MAILJET_PUB_KEY}")
     private String mailjetPublicKey;
@@ -21,6 +23,9 @@ public class MailjetServiceImpl implements EmailService {
 
     @Value("${MAILJET_SENDER}")
     private String senderEmail;
+
+    @Value("${TEST_EMAIL}")
+    private String testEmail;
 
     @Override
     public void sendEmail(String to, String subject, String body) {
@@ -37,15 +42,11 @@ public class MailjetServiceImpl implements EmailService {
                                             .put("Name", "Mailjet Pilot"))
                                     .put(Emailv31.Message.TO, new JSONArray()
                                             .put(new JSONObject()
-                                                    .put("Email", to)
+                                                    .put("Email", testEmail)
                                                     .put("Name", "passenger 1")))
-                                    .put(Emailv31.Message.SUBJECT, "Your email flight plan!")
-                                    .put(Emailv31.Message.TEXTPART, "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!")
-                                    .put(Emailv31.Message.HTMLPART, "<h3>Dear passenger 1, welcome to <a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3><br />May the delivery force be with you!")));
-            response = client.post(request);
-            System.out.println(response.getStatus());
-            System.out.println(response.getData());
-
+                                    .put(Emailv31.Message.SUBJECT, subject)
+                                    .put(Emailv31.Message.HTMLPART, body)));
+            client.post(request);
         } catch (MailjetException e) {
             throw new ExternalServiceException("Error occurred while sending email.");
         }

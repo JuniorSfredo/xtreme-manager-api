@@ -3,6 +3,7 @@ package com.juniorsfredo.xtreme_management_api.domain.services;
 import com.juniorsfredo.xtreme_management_api.api.assembler.UserAssembler;
 import com.juniorsfredo.xtreme_management_api.api.dto.auth.*;
 import com.juniorsfredo.xtreme_management_api.api.dto.user.UserDetailsResponseDTO;
+import com.juniorsfredo.xtreme_management_api.domain.exceptions.BusinessException;
 import com.juniorsfredo.xtreme_management_api.domain.exceptions.InvalidCredentialsException;
 import com.juniorsfredo.xtreme_management_api.domain.models.User;
 import com.juniorsfredo.xtreme_management_api.domain.repositories.cache.ResetPasswordCache;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -28,16 +30,20 @@ public class AuthService {
 
     private final ResetPasswordCache resetPasswordCache;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
     public AuthService(AuthenticationConfiguration config,
                        JwtService jwtService,
                        UserAssembler userAssembler,
-                       ResetPasswordCache resetPasswordCache
+                       ResetPasswordCache resetPasswordCache,
+                       PasswordEncoder passwordEncoder
     ) throws Exception {
         this.authManager = config.getAuthenticationManager();
         this.jwtService = jwtService;
         this.userAssembler = userAssembler;
         this.resetPasswordCache = resetPasswordCache;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public AuthenticatedResponseDTO login(UserLoginDTO userBody)  {
@@ -69,12 +75,37 @@ public class AuthService {
         return String.valueOf(code);
     }
 
-    public void saveSessionToken(Long userId, String email) {
-        String token = jwtService.generateSessionTokenResetPassword(email);
-        resetPasswordCache.saveSessionToken(userId, token);
-    }
-
     public void saveCode(Long userId, String code) {
         resetPasswordCache.saveCode(userId, code);
+    }
+
+    public Boolean isValidCode(Long userId, String code) {
+        if (code == null || code.isBlank()) {
+            return false;
+        }
+
+        String validCode = resetPasswordCache.getCode(userId);
+
+        if (validCode == null) {
+            return false;
+        }
+
+        boolean isValid = code.equals(validCode);
+
+        if (!isValid) {
+            return false;
+        }
+
+        resetPasswordCache.saveCode(userId, validCode);
+
+        return true;
+    }
+
+    public void invalidateCode(Long userId) {
+        resetPasswordCache.deleteCode(userId);
+    }
+
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 }
